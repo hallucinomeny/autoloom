@@ -21,7 +21,7 @@ print_yellow() {
 
 # Create a virtual environment
 print_green "Creating virtual environment..."
-python3 -m venv venv
+python3 -m venv .venv
 
 # Activate the virtual environment
 print_green "Activating virtual environment..."
@@ -38,14 +38,15 @@ pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-re
 
 # Install other requirements
 print_green "Installing other requirements..."
-pip install transformers rich flax
+pip install -r requirements.txt
+
 
 # Deactivate the virtual environment
 deactivate
 
 print_green "Setup complete!"
 print_yellow "To activate the virtual environment, run:"
-echo "source venv/bin/activate"
+echo "source .venv/bin/activate"
 print_yellow "Then, to verify JAX is using the GPU, run:"
 echo "python -c 'import jax; print(jax.devices())'"
 print_yellow "If you see GPU devices listed, you're good to go. If not, you may need to set up CUDA manually."
