@@ -10,7 +10,7 @@ class SortableTreeWidgetItem(QTreeWidgetItem):
     def __lt__(self, other):
         column = self.treeWidget().sortColumn()
         try:
-            if column in [1, 6]:  # Log Probability and Top-k Ratio columns
+            if column in [1, 5]:  # Probability and Sum of Raw Probs columns
                 return float(self.text(column)) > float(other.text(column))  # Sort in descending order
             else:
                 return float(self.text(column)) < float(other.text(column))
@@ -20,8 +20,8 @@ class SortableTreeWidgetItem(QTreeWidgetItem):
 class MCTSTreeWidget(QTreeWidget):
     def __init__(self):
         super().__init__()
-        self.setColumnCount(7)
-        self.setHeaderLabels(["Path", "Log Probability", "Entropy", "Depth", "Optimal Top-k", "Child Count", "Optimal Top-k"])
+        self.setColumnCount(6)
+        self.setHeaderLabels(["Path", "Probability", "Entropy", "Depth", "Child Count", "Sum of Raw Probs"])
         self.setSortingEnabled(True)
         self.setAlternatingRowColors(True)
         self.viewport().installEventFilter(self)

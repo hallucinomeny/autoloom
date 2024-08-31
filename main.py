@@ -54,7 +54,7 @@ class MainWindow(MCTSUI):
             self.language_model = LanguageModel.from_pretrained("distilgpt2", cache_dir="/home/cloudforest/Weights/pretrained")
             
             logger.info("Creating MCTS worker...")
-            self.worker = MCTSWorker(self.language_model, num_workers=8)
+            self.worker = MCTSWorker(self.language_model, num_workers=16)
             
             logger.info("Setting language model in UI...")
             self.set_language_model(self.language_model)
@@ -87,11 +87,11 @@ class MainWindow(MCTSUI):
         self.ui_update_thread.start()
 
     @timing_decorator
-    def start_mcts_worker(self, prompt, temperature, min_prob, entropy_factor, eps):
+    def start_mcts_worker(self, prompt, temperature, min_prob, entropy_factor):
         """Start the MCTS worker with given parameters"""
         prompt_token_ids = self.language_model.tokenizer.encode(prompt)
-        self.language_model.set_eps(eps)  # Set eps in the language model
-        self.worker.set_params(prompt_token_ids, temperature, min_prob, entropy_factor, eps)
+        # Removed setting eps in the language model
+        self.worker.set_params(prompt_token_ids, temperature, min_prob, entropy_factor)
         self.worker.start()
 
     def log_performance(self, performance_data):

@@ -90,7 +90,7 @@ class MCTSUI(QMainWindow):
         # Tree view
         self.tree_widget = QTreeWidget()
         self.tree_widget.setColumnCount(6)
-        self.tree_widget.setHeaderLabels(["Path", "Probability", "Entropy", "Depth", "Optimal Top-k", "Child Count"])
+        self.tree_widget.setHeaderLabels(["Path", "Probability", "Entropy", "Depth", "Child Count", "Sum of Raw Probs"])
         self.tree_widget.setSortingEnabled(True)
         self.tree_widget.setAlternatingRowColors(True)
         self.tree_widget.viewport().installEventFilter(self)
@@ -173,14 +173,14 @@ class MCTSUI(QMainWindow):
         self.paths_data.clear()
 
         for path_data in paths:
-            path, prob, entropy, depth, optimal_topk_length, child_count, child_data = path_data
+            path, prob, entropy, depth, raw_sum, child_count, child_data = path_data
             item = SortableTreeWidgetItem(self.tree_widget, [
                 path,
                 f"{prob:.6e}",
                 f"{entropy:.4f}",
                 str(depth),
-                str(optimal_topk_length),
-                str(child_count)
+                str(child_count),
+                f"{raw_sum:.4f}"
             ])
             self.paths_data[path] = path_data
 

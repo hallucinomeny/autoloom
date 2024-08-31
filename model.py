@@ -28,7 +28,6 @@ class LanguageModel:
         self.lock = None
         self.memory_threshold = 0.8  # 80% memory usage threshold
         self.loop = None  # We'll set this later in set_event_loop
-        self.eps = 0.01  # Default value for eps
         self.eff_zero = 1e-15
         self.vocab_size = None  # We'll set this when loading the model
 
@@ -99,9 +98,14 @@ class LanguageModel:
             
             attention_mask = (input_ids != self.tokenizer.pad_token_id).astype(jnp.int32)
             
+            # Use stop_gradient to prevent gradient computation
+            input_ids = lax.stop_gradient(input_ids)
+            attention_mask = lax.stop_gradient(attention_mask)
+            
             outputs = self.model(input_ids=input_ids, attention_mask=attention_mask)
             
-            logits = outputs.logits[:, -1, :]
+            # Use stop_gradient on the output logits
+            logits = lax.stop_gradient(outputs.logits[:, -1, :])
             
             return logits
         except Exception as e:
@@ -115,13 +119,13 @@ class LanguageModel:
 
         clipped_probs, entropies = self._clip_logits_batch(logits, temperature, min_prob)
         truncated_probs, truncated_indices = self._truncate_probs_batch(clipped_probs, entropy_factor ** entropies)
-        optimal_topk_batch = self._find_optimal_topk_batch(clipped_probs, self.eps)
-
+        
         results = []
         for i in range(truncated_probs.shape[0]):
             valid_mask = truncated_indices[i] != -1
             distribution = {int(idx): float(prob) for idx, prob in zip(truncated_indices[i][valid_mask], truncated_probs[i][valid_mask])}
-            results.append((distribution, float(entropies[i]), int(optimal_topk_batch[i])))
+            raw_sum = float(jnp.sum(clipped_probs[i][truncated_indices[i][valid_mask]]))  # Sum of unnormalized clipped probabilities of children
+            results.append((distribution, float(entropies[i]), raw_sum))
 
         return results
 
@@ -129,18 +133,17 @@ class LanguageModel:
         self.loop = loop
         self.inference_queue = asyncio.Queue()
 
-    def set_eps(self, eps):
-        self.eps = eps
-
     @staticmethod
     @jax.jit
     def _clip_logits_batch(logits, temperature, min_prob):
+        # Use stop_gradient on input logits
+        logits = lax.stop_gradient(logits)
         scaled_logits = logits / temperature
         probs = jax.nn.softmax(scaled_logits, axis=-1)
         clipped_probs = jnp.where(probs < min_prob, 0.0, probs)
         clipped_probs = clipped_probs / jnp.sum(clipped_probs, axis=-1, keepdims=True)
         entropy = jnp.sum(-clipped_probs * jnp.log(clipped_probs + 1e-10), axis=-1)
-        return clipped_probs, entropy
+        return lax.stop_gradient(clipped_probs), lax.stop_gradient(entropy)
 
     @staticmethod
     @jax.jit

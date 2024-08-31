@@ -27,19 +27,19 @@ class MCTSWorker(QThread):
         self.temperature = 1.0
         self.min_prob = 1e-6
         self.entropy_factor = 3.0
-        self.eps = 0.01
+        # Removed eps
         self.num_workers = num_workers
         self.lock = asyncio.Lock()
         self.performance_data = self.reset_performance_data()
         self.paused = False
         self.pause_condition = asyncio.Condition()
 
-    def set_params(self, prompt_token_ids, temperature, min_prob, entropy_factor, eps):
+    def set_params(self, prompt_token_ids, temperature, min_prob, entropy_factor):
         self.prompt_token_ids = prompt_token_ids
         self.temperature = temperature
         self.min_prob = min_prob
         self.entropy_factor = entropy_factor
-        self.eps = eps
+        # Removed eps
 
     def run(self):
         loop = asyncio.new_event_loop()
@@ -162,11 +162,11 @@ class MCTSWorker(QThread):
         for node, result in zip(nodes, results):
             if result is None:
                 continue
-            distribution, entropy, optimal_topk = result
+            distribution, entropy, raw_sum = result
             node.entropy = entropy
-            node.optimal_topk = int(optimal_topk)
+            node.raw_sum = raw_sum  # Store the raw sum in the node
             
-            for token_id, prob in distribution.items():  # Change this line
+            for token_id, prob in distribution.items():
                 child = Node([int(token_id)], parent=node)
                 child.logprob = jnp.log(prob)
                 node.add_child(child)
@@ -209,9 +209,9 @@ class MCTSWorker(QThread):
 
         if node.children and all(not child.children for child in node.children):
             child_data = [(int(child.token_ids[0]), math.exp(child.logprob), child.logprob) for child in node.children]
-            child_data.sort(key=lambda x: x[1], reverse=True)  # Sort by probability (descending)
+            child_data.sort(key=lambda x: x[1], reverse=True)
             paths.append((new_path, math.exp(new_logprob) if not jnp.isinf(new_logprob) else 0, 
-                          node.entropy, node.depth, int(node.optimal_topk), len(node.children), child_data))
+                          node.entropy, node.depth, node.raw_sum, len(node.children), child_data))
         else:
             for child in node.children:
                 self.dfs_parents(child, new_path, new_logprob, paths)

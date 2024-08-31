@@ -15,14 +15,14 @@ import time
 
 class MCTSUI(QMainWindow):
     update_ui_signal = pyqtSignal(list, int)
-    start_mcts_signal = pyqtSignal(str, float, float, float, float)
+    start_mcts_signal = pyqtSignal(str, float, float, float)
     pause_mcts_signal = pyqtSignal()
     reset_mcts_signal = pyqtSignal()
 
     def __init__(self):
         super().__init__()
         self.setWindowTitle("MCTS Path Probabilities")
-        self.setGeometry(100, 100, 1000, 600)  # Increased width to accommodate new column
+        self.setGeometry(100, 100, 1000, 600)
         self.setStyleSheet(get_styles())
 
         self.thread_pool = QThreadPool()
@@ -38,7 +38,6 @@ class MCTSUI(QMainWindow):
         self.update_queue = queue.Queue()
         self.paths_data = {}
 
-        # Connect the update_ui_signal to the update_ui_slot
         self.update_ui_signal.connect(self.update_ui_slot)
 
     def setup_ui(self):
@@ -70,13 +69,10 @@ class MCTSUI(QMainWindow):
         self.min_prob_input.setValidator(QDoubleValidator(0.0, 1.0, 10))
         self.entropy_factor_input = QLineEdit("3.0")
         self.entropy_factor_input.setValidator(QDoubleValidator(0.0, 100.0, 2))
-        self.eps_input = QLineEdit("0.01")
-        self.eps_input.setValidator(QDoubleValidator(0.0, 1.0, 4))
 
         params_layout.addRow("Temperature:", self.temperature_input)
         params_layout.addRow("Min Probability:", self.min_prob_input)
         params_layout.addRow("Entropy Factor:", self.entropy_factor_input)
-        params_layout.addRow("Epsilon:", self.eps_input)
 
         button_layout = QHBoxLayout()
         self.start_button = QPushButton("Start MCTS")
@@ -101,17 +97,16 @@ class MCTSUI(QMainWindow):
         
         # Tree widget (left side)
         self.tree_widget = MCTSTreeWidget()
-        self.tree_widget.setHeaderLabels(["Path", "Log Probability", "Entropy", "Depth", "Optimal Top-k", "Child Count", "Top-k Ratio"])
+        self.tree_widget.setHeaderLabels(["Path", "Probability (%)", "Entropy", "Depth", "Child Count", "Sum of Raw Probs (%)"])
         self.tree_widget.itemSelectionChanged.connect(self.on_tree_item_selected)
         splitter.addWidget(self.tree_widget)
         
         # Leaf table widget (right side)
         self.leaf_table = LeafTableWidget()
         self.leaf_table.setColumnCount(2)
-        self.leaf_table.setHorizontalHeaderLabels(["Token", "Conditional Probability"])
+        self.leaf_table.setHorizontalHeaderLabels(["Token", "Conditional Probability (%)"])
         splitter.addWidget(self.leaf_table)
         
-        # Set initial sizes (adjust as needed)
         splitter.setSizes([int(self.width() * 0.6), int(self.width() * 0.4)])
         
         main_layout.addWidget(splitter)
@@ -131,8 +126,7 @@ class MCTSUI(QMainWindow):
         temperature = float(self.temperature_input.text())
         min_prob = float(self.min_prob_input.text())
         entropy_factor = float(self.entropy_factor_input.text())
-        eps = float(self.eps_input.text())
-        self.start_mcts_signal.emit(prompt, temperature, min_prob, entropy_factor, eps)
+        self.start_mcts_signal.emit(prompt, temperature, min_prob, entropy_factor)
         self.start_button.setEnabled(False)
         self.pause_button.setEnabled(True)
         self.reset_button.setEnabled(True)
@@ -175,33 +169,24 @@ class MCTSUI(QMainWindow):
     def update_tree_widget(self, paths):
         current_items = set()
         for path_data in paths:
-            if len(path_data) >= 4:
-                path, prob, entropy, depth = path_data[:4]
-                optimal_topk = path_data[4] if len(path_data) > 4 else 0
-                child_count = path_data[5] if len(path_data) > 5 else 0
-                child_data = path_data[6] if len(path_data) > 6 else []
+            if len(path_data) >= 7:
+                path, prob, entropy, depth, raw_sum, child_count, child_data = path_data
                 
-                log_prob = math.log(prob) if prob > 0 else float('-inf')
-                topk_ratio = optimal_topk / child_count if child_count > 0 else 0
-
                 decoded_path = self.decode_path(path)
                 item = self.find_or_create_item(decoded_path)
-                item.setData(0, Qt.ItemDataRole.UserRole, path)  # Store original path for reference
-                item.setText(1, f"{log_prob:.4f}")
+                item.setData(0, Qt.ItemDataRole.UserRole, path)
+                item.setText(1, f"{prob * 100:.4f}%")
                 item.setText(2, f"{entropy:.4f}")
                 item.setText(3, str(depth))
-                item.setText(4, str(optimal_topk))
-                item.setText(5, str(child_count))
-                item.setText(6, f"{topk_ratio:.4f}")
+                item.setText(4, str(child_count))
+                item.setText(5, f"{raw_sum * 100:.4f}%")  # Display raw_sum as percentage
 
-                self.paths_data[decoded_path] = (path, prob, entropy, depth, optimal_topk, child_count, child_data)
+                self.paths_data[decoded_path] = path_data
                 current_items.add(decoded_path)
             else:
                 print(f"Unexpected path_data format: {path_data}")
 
-        # Remove items that are no longer present
         self.remove_stale_items(current_items)
-
         self.tree_widget.sortItems(1, Qt.SortOrder.DescendingOrder)
 
     def decode_path(self, path):
@@ -227,7 +212,6 @@ class MCTSUI(QMainWindow):
 
     def set_language_model(self, language_model):
         self.language_model = language_model
-        # Update any UI elements that depend on the language model here
 
     def on_tree_item_selected(self):
         selected_items = self.tree_widget.selectedItems()
@@ -257,27 +241,27 @@ class MCTSUI(QMainWindow):
                 except (OverflowError, ValueError):
                     token = f"<Invalid Token ID: {token_id}>"
                 self.leaf_table.setItem(row, 0, QTableWidgetItem(token))
-                self.leaf_table.setItem(row, 1, QTableWidgetItem(f"{prob:.6f}"))
+                self.leaf_table.setItem(row, 1, QTableWidgetItem(f"{prob * 100:.4f}%"))
         self.leaf_table.sortItems(1, Qt.SortOrder.DescendingOrder)
 
     def show_error_message(self, message):
         print(f"Error: {message}")
-        # TODO: Implement this method to show error messages in your UI
-        # For example:
-        # if hasattr(self, 'statusBar'):
-        #     self.statusBar().showMessage(message, 5000)
 
     def process_update_queue(self):
         try:
             paths, total_nodes = self.update_queue.get_nowait()
-            self.update_ui(paths, total_nodes)
         except queue.Empty:
-            pass
+            return
+
+        for path_data in paths:
+            path, prob, entropy, depth, raw_sum, child_count, child_data = path_data
+            item = self.find_or_create_item(path)
+            item.setText(5, f"{raw_sum:.4f}")
 
 class SortableTreeWidgetItem(QTreeWidgetItem):
     def __lt__(self, other):
         column = self.treeWidget().sortColumn()
         try:
-            return float(self.text(column)) < float(other.text(column))
+            return float(self.text(column).rstrip('%')) < float(other.text(column).rstrip('%'))
         except ValueError:
             return self.text(column) < other.text(column)

@@ -11,7 +11,7 @@ class Node:
         self.value = 0
         self.logprob = 0.0
         self.entropy = 0
-        self.optimal_topk = 0
+        self.raw_sum = 0
         self.depth = 0 if parent is None else parent.depth + 1
 
     def add_child(self, child):
