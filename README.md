@@ -40,19 +40,14 @@ To install and run follow these steps:
 ### Requirements
 
 This project has the following requirements:
-
-1. Python dependencies:
-   - All dependencies are listed in and installed by `setup.sh`
-
-2. Pre-trained Language Model:
-   - The project uses a pre-trained language model from Hugging Face
-   - Default model: "distilgpt2"
-   - Model can be changed by setting the `MODEL_NAME` variable in `main.py`
-
-3. Model Cache Directory:
-   - The model weights are automatically downloaded to a cache directory
-   - Default directory: "path/to/your/cache/directory"
-   - Cache location can be changed by setting the `MODEL_CACHE_DIR` variable in `main.py`
+- Python and CUDA dependencies: All listed in and installed by `setup.sh`
+- Pre-trained Language Model and Cache Directory:
+  - The project uses a pre-trained language model from Hugging Face
+  - Default model: "distilgpt2"
+  - Model can be changed by setting the `MODEL_NAME` variable in `main.py`
+  - Model weights are automatically downloaded to a cache directory
+  - Default cache directory: "path/to/your/cache/directory"
+  - Both model and cache location can be changed by setting the `MODEL_NAME` and `MODEL_CACHE_DIR` variables in `main.py`
 
 ### Disclaimer
 
