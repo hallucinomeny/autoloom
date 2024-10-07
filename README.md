@@ -36,6 +36,24 @@ To install and run follow these steps:
    python main.py
    ```
 
+   
+### Requirements
+
+This project has the following requirements:
+
+1. Python dependencies:
+   - All dependencies are listed in and installed by `setup.sh`
+
+2. Pre-trained Language Model:
+   - The project uses a pre-trained language model from Hugging Face
+   - Default model: "distilgpt2"
+   - Model can be changed by setting the `MODEL_NAME` variable in `main.py`
+
+3. Model Cache Directory:
+   - The model weights are automatically downloaded to a cache directory
+   - Default directory: "path/to/your/cache/directory"
+   - Cache location can be changed by setting the `MODEL_CACHE_DIR` variable in `main.py`
+
 ### Disclaimer
 
 THE CODE IS A MESS. 
@@ -45,13 +63,6 @@ ATTEMPT AT YOUR OWN RISK.
 If it does happen to work consider yourself lucky. 
 
 If not, please open an issue, it will be educational at very least.
-
-### Requirements
-
-- Dependencies listed in `setup.sh`
-
-
-The project requires weights of a pre-trained language model with hugging face name `MODEL_NAME` (default is "distilgpt2") which it downloads automatically to a directory specified by the `MODEL_CACHE_DIR` variable (default is "path/to/your/cache/directory"). Both variables can be set in the `main.py` file.
 
 ## License
 
