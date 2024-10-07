@@ -1,6 +1,6 @@
 ## Installation
 
-To install and run MCTS Pathfinder, follow these steps:
+To install and run follow these steps:
 
 1. Clone the repository:
    ```
