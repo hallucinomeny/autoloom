@@ -26,8 +26,8 @@ class MCTSWorker(QThread):
         self.running = False
         self.temperature = 1.0
         self.min_prob = 1e-6
-        self.entropy_factor = 3.0
-        # Removed eps
+        self.entropy_factor = 3.0 
+        self.eps = 0.01
         self.num_workers = num_workers
         self.lock = asyncio.Lock()
         self.performance_data = self.reset_performance_data()

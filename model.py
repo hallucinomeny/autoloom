@@ -17,6 +17,7 @@ from functools import partial
 import logging
 logger = logging.getLogger(__name__)
 
+
 class LanguageModel:
     def __init__(self):
         self.model = None
@@ -34,7 +35,7 @@ class LanguageModel:
     @classmethod
     def from_pretrained(cls, model_name, cache_dir, **kwargs):
         if cache_dir is None:
-            cache_dir = Path(os.environ.get('MODEL_CACHE_DIR', '/home/cloudforest/Weights/pretrained'))
+            cache_dir = Path(os.environ.get('MODEL_CACHE_DIR'))
         else:
             cache_dir = Path(cache_dir)
         
