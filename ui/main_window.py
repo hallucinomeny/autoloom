@@ -2,16 +2,12 @@ import queue
 import math
 import numpy as np
 from PyQt6.QtWidgets import (QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, 
-                             QLabel, QLineEdit, QPushButton, QFrame, QFormLayout, QToolTip,
-                             QSplitter, QTableWidgetItem, QApplication, QTreeWidgetItem)
-from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QEvent, QThreadPool, QMetaObject, Q_ARG, pyqtSlot
+                             QLabel, QLineEdit, QPushButton, QFrame, QFormLayout,
+                             QSplitter, QTableWidgetItem, QTreeWidgetItem)
+from PyQt6.QtCore import Qt, pyqtSignal, QTimer, QThreadPool, pyqtSlot
 from PyQt6.QtGui import QDoubleValidator
 from .styles import get_styles
 from .tree_widget import MCTSTreeWidget, SortableTreeWidgetItem, LeafTableWidget
-from .update_worker import UpdateWorker
-import psutil
-import os
-import time
 
 class MCTSUI(QMainWindow):
     update_ui_signal = pyqtSignal(list, int)

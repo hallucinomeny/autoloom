@@ -3,8 +3,6 @@ import random
 from PyQt6.QtCore import QThread, pyqtSignal
 from tree import Node, Tree
 import math
-from jax.scipy.special import entr
-import jax
 import jax.numpy as jnp
 import psutil
 import os
