@@ -43,7 +43,8 @@ DO NOT EXPECT IT TO WORK.
 ATTEMPT AT YOUR OWN RISK.
 
 If it does happen to work consider yourself lucky. 
-If not, please open an issue so I at the very least we can learn from the experience.
+
+If not, please open an issue, it will be educational at very least.
 
 ### Requirements
 
