@@ -24,10 +24,7 @@ class LanguageModel:
 
     @classmethod
     def from_pretrained(cls, model_name, cache_dir, **kwargs):
-        if cache_dir is None:
-            cache_dir = Path(os.environ.get('MODEL_CACHE_DIR'))
-        else:
-            cache_dir = Path(cache_dir)
+        cache_dir = Path(cache_dir)
         
         if model_name is None:
             available_models = [d.name for d in cache_dir.iterdir() if d.is_dir()]

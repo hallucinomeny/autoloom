@@ -1,6 +1,0 @@
-jax
-jaxlib
-transformers
-rich
-PyQt6
-psutil

@@ -13,6 +13,10 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+MODEL_NAME = "distilgpt2"
+MODEL_CACHE_DIR = "path/to/your/cache/directory"
+
+
 # Decorator to measure and print the execution time of functions
 def timing_decorator(func):
     @functools.wraps(func)
@@ -51,7 +55,8 @@ class MainWindow(MCTSUI):
             logger.info("Initializing MainWindow...")
             
             logger.info("Initializing language model...")
-            self.language_model = LanguageModel.from_pretrained("distilgpt2", cache_dir="/home/cloudforest/Weights/pretrained")
+
+            self.language_model = LanguageModel.from_pretrained(MODEL_NAME, cache_dir=MODEL_CACHE_DIR)
             
             logger.info("Creating MCTS worker...")
             self.worker = MCTSWorker(self.language_model, num_workers=16)
