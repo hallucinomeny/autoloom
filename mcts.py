@@ -231,7 +231,7 @@ class MCTSWorker(QThread):
             "simulate_count": 0,
             "backpropagate_count": 0,
             "language_model_count": 0,
-            "selection_count": 0,  # Add this line
+            "selection_count": 0,
         }
 
     def pause(self):

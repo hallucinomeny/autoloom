@@ -1,6 +1,5 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from PyQt6.QtGui import QDoubleValidator
 from PyQt6.QtCore import QThread, pyqtSignal
 from ui import MCTSUI
 from mcts import MCTSWorker
@@ -95,7 +94,6 @@ class MainWindow(MCTSUI):
     def start_mcts_worker(self, prompt, temperature, min_prob, entropy_factor):
         """Start the MCTS worker with given parameters"""
         prompt_token_ids = self.language_model.tokenizer.encode(prompt)
-        # Removed setting eps in the language model
         self.worker.set_params(prompt_token_ids, temperature, min_prob, entropy_factor)
         self.worker.start()
 
