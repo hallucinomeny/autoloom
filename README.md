@@ -61,13 +61,13 @@ If not, please open an issue, it will be educational at very least.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License or whatever.
 
 ## Contributing
 
 An older unstable version of the project had an extra ui feature which plotted the logits for each token.
 
-That version is unfortunately lost, but if you feel like adding this feature back in, please do! 
+That version is not with us anymore, but if you feel like adding this feature back in, please do! 
 
 :bing_smiley:
  
