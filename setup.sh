@@ -17,15 +17,13 @@ print_yellow() {
     echo -e "${YELLOW}$1${NC}"
 }
 
-
-
 # Create a virtual environment
 print_green "Creating virtual environment..."
-python3 -m venv venv
+python3 -m venv .venv
 
 # Activate the virtual environment
 print_green "Activating virtual environment..."
-source venv/bin/activate
+source .venv/bin/activate
 
 # Upgrade pip
 print_green "Upgrading pip..."
@@ -38,15 +36,10 @@ pip install --upgrade "jax[cuda12_pip]" -f https://storage.googleapis.com/jax-re
 
 # Install other requirements
 print_green "Installing other requirements..."
-pip install transformers rich flax
-
-# Deactivate the virtual environment
-deactivate
+pip install transformers rich flax PyQt6 psutil
 
 print_green "Setup complete!"
-print_yellow "To activate the virtual environment, run:"
-echo "source venv/bin/activate"
-print_yellow "Then, to verify JAX is using the GPU, run:"
+print_yellow "Enviornment is activated. To verify JAX is using the GPU, run:"
 echo "python -c 'import jax; print(jax.devices())'"
 print_yellow "If you see GPU devices listed, you're good to go. If not, you may need to set up CUDA manually."
 print_yellow "To run the program:"
