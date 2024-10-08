@@ -40,7 +40,7 @@ To install and run follow these steps:
 ### Requirements
 
 This project has the following requirements:
-- Python and CUDA dependencies: All listed in and installed by `setup.sh`
+- Python dependencies: All listed in and installed by `setup.sh`
 - Pre-trained Language Model and Cache Directory:
   - The project uses a pre-trained language model from Hugging Face
   - Default model: "distilgpt2"
