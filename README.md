@@ -48,17 +48,7 @@ This project has the following requirements:
   - Model weights are automatically downloaded to a cache directory
   - Default cache directory: "path/to/your/cache/directory"
   - Both model and cache location can be changed by setting the `MODEL_NAME` and `MODEL_CACHE_DIR` variables in `main.py`
-
-### Disclaimer
-
-THE CODE IS A MESS. 
-DO NOT EXPECT IT TO WORK.
-ATTEMPT AT YOUR OWN RISK.
-
-If it does happen to work consider yourself lucky. 
-
-If not, please open an issue, it will be educational at very least.
-
+  - 
 ## License
 
 This project is licensed under the MIT License or whatever.
